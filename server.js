@@ -1,8 +1,8 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import connectDB from './config/db.js';
-import cookieParser from 'cookie-parser';
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import connectDB from "./config/db.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -16,7 +16,5 @@ app.use(cookieParser());
 connectDB();
 
 app.listen(process.env.PORT || 5000, () => {
-    console.log(`✅ Server is runnning on port ${process.env.PORT || 5000}`);
+  console.log(`✅ Server is runnning on port ${process.env.PORT || 5000}`);
 });
-
-
