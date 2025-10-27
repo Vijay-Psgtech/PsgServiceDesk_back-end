@@ -2,7 +2,7 @@ import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import RefreshToken from "../models/refreshToken.js";
-import { createAccessToken, createRefreshToken } from "../utils/token.js";
+import { createAccessToken, createRefreshAccessToken } from "../utils/token.js";
 
 const cookieOptions = (maxAgeMs) => ({
     httpOnly: true,
@@ -31,7 +31,7 @@ export const login = async (req, res) => {
         const accessToken = createAccessToken(payload);
 
         const refreshExpiry = rememberMe ? process.env.REFRESH_TOKEN_EXPIRES : process.env.REFRESH_TOKEN_EXPIRES_SHORT;
-        const refreshToken = createRefreshToken(payload, refreshExpiry);
+        const refreshToken = createRefreshAccessToken(payload, refreshExpiry);
 
         const decoded = jwt.decode(refreshToken);
         const expiresAt = new Date(decoded.exp * 1000);
