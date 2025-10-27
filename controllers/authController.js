@@ -68,3 +68,12 @@ export const refresh = async (req, res) => {
         res.status(403).json({ message: "Refresh token expired" });
     }
 };
+
+export const logout = async (req, res) => {
+    const token = req.cookies.refreshToken;
+    if(token) {
+        await RefreshToken.deleteOne({ token }).catch(() => {});
+    }
+    res.clearCookie("refreshToken", cookieOptions(0));
+    res.status(200).json({ message: "Logged out successfully" });
+};
