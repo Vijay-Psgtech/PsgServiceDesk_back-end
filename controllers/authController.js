@@ -46,4 +46,25 @@ export const login = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Server Error", error: error.message });
     }
-}
+};
+
+export const refresh = async (req, res) => {
+    const token = req.cookies.refreshToken;
+    if(!token) return res.status(401).json({ message: "No token provided" });
+
+    const existingToken = await RefreshToken.findOne({ token }).populate("user");
+    if(!existingToken) return res.status(401).json({ message: "Invalid token" });
+    try {
+        const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+        const newAccessToken = createAccessToken({
+            id: payload.id,
+            role: payload.role,
+            userName: payload.userName,
+            institution: payload.institution,
+        });
+        res.json({ accessToken: newAccessToken, user: payload });
+    } catch (error) {
+        await RefreshToken.deleteOne({ token }).catch(() => {});
+        res.status(403).json({ message: "Refresh token expired" });
+    }
+};
