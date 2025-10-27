@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
+import authRoutes from "./routes/authRoute.js";
 import userRoutes from "./routes/userRoute.js";
 import institutionRoutes from "./routes/institutionRoute.js";
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Rooutes API
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/institutions", institutionRoutes);
 

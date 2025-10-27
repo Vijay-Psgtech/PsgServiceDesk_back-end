@@ -10,3 +10,38 @@ const cookieOptions = (maxAgeMs) => ({
     sameSite: "Lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 });
+
+export const login = async (req, res) => {
+    try {
+        const { userName, password, rememberMe } = req.body;
+        const user = await User.findOne({ userName }).populate("institution");
+        if (!user) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
+        if(!isMatch) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+        const payload = {
+            id: user._id,
+            role: user.role,
+            userName: user.userName,
+            institution: user.institution,
+        };
+        const accessToken = createAccessToken(payload);
+
+        const refreshExpiry = rememberMe ? process.env.REFRESH_TOKEN_EXPIRES : process.env.REFRESH_TOKEN_EXPIRES_SHORT;
+        const refreshToken = createRefreshToken(payload, refreshExpiry);
+
+        const decoded = jwt.decode(refreshToken);
+        const expiresAt = new Date(decoded.exp * 1000);
+        await RefreshToken.create({ token: refreshToken, user: user._id, expiresAt });
+
+        res.cookie("refreshToken", refreshToken, cookieOptions(maxAgeMs));
+
+        res.status(200).json({ accessToken, user: payload });
+
+    } catch (error) {
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+}
