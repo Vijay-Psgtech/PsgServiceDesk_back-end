@@ -77,3 +77,10 @@ export const logout = async (req, res) => {
     res.clearCookie("refreshToken", cookieOptions(0));
     res.status(200).json({ message: "Logged out successfully" });
 };
+
+export const logoutAll = async (req, res) => {
+    const userId = req.user.id;
+    await RefreshToken.deleteMany({ user: userId }).catch(() => {});
+    res.clearCookie("refreshToken", cookieOptions(0));
+    res.status(200).json({ message: "Logged out from all devices successfully" });
+}
