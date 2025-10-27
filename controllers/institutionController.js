@@ -14,6 +14,10 @@ export const getAllInstitutions = async (req, res) => {
 export const createInstitution = async (req, res) => {
     try{
         const newInstitution = new Institution(req.body);
+        const nameExists = await Institution.findOne({ name: newInstitution.name });
+        if (nameExists) {
+            return res.status(400).json({ messgae : "Institution name already exists" });
+        }
         const savedInstitution = await newInstitution.save();
         res.status(201).json(savedInstitution);
     } catch (error) {
