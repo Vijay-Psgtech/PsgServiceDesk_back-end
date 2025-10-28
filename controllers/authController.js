@@ -35,7 +35,7 @@ export const login = async (req, res) => {
 
         const decoded = jwt.decode(refreshToken);
         const expiresAt = new Date(decoded.exp * 1000);
-        await RefreshToken.create({ token: refreshToken, user: user._id, expiresAt });
+        await RefreshToken.create({ token: refreshToken, userId: user._id, expiresAt });
 
         const maxAgeMs = rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 7 days or 1 day
 

@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import bcrypt from "bcryptjs";
 
 // Get all users
 
@@ -33,8 +34,8 @@ export const createUser = async (req, res) => {
     if (emailExists)
       return res.status(400).json({ message: "Email already in use" });
 
-    const passwordHashed = await bcrypt.hash(req.body.password, 10);
-    req.body.password = passwordHashed;
+    const passwordHashed = await bcrypt.hash(req.body.passwordHash, 10);
+    req.body.passwordHash = passwordHashed;
 
     const newUser = new User(req.body);
     const savedUser = await newUser.save();
