@@ -52,7 +52,7 @@ export const refresh = async (req, res) => {
     const token = req.cookies.refreshToken;
     if(!token) return res.status(401).json({ message: "No token provided" });
 
-    const existingToken = await RefreshToken.findOne({ token }).populate("user");
+    const existingToken = await RefreshToken.findOne({ token });
     if(!existingToken) return res.status(401).json({ message: "Invalid token" });
     try {
         const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
