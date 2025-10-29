@@ -14,10 +14,17 @@ const cookieOptions = (maxAgeMs) => ({
 export const login = async (req, res) => {
     try {
         const { userName, password, rememberMe } = req.body;
+        
         const user = await User.findOne({ userName }).populate("institution");
         if (!user) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
+
+        //check whether user is active
+        if(!user.isActive){
+            return res.status(403).json({ message: "Your account is inactive. Please contact admin."});
+        }
+
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if(!isMatch) {
             return res.status(400).json({ message: "Invalid credentials" });
