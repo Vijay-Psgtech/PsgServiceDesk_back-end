@@ -14,10 +14,17 @@ const cookieOptions = (maxAgeMs) => ({
 export const login = async (req, res) => {
     try {
         const { userName, password, rememberMe } = req.body;
+        
         const user = await User.findOne({ userName }).populate("institution");
         if (!user) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
+
+        //check whether user is active
+        if(!user.isActive){
+            return res.status(403).json({ message: "Your account is inactive. Please contact admin."});
+        }
+
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if(!isMatch) {
             return res.status(400).json({ message: "Invalid credentials" });
@@ -52,7 +59,7 @@ export const refresh = async (req, res) => {
     const token = req.cookies.refreshToken;
     if(!token) return res.status(401).json({ message: "No token provided" });
 
-    const existingToken = await RefreshToken.findOne({ token }).populate("user");
+    const existingToken = await RefreshToken.findOne({ token });
     if(!existingToken) return res.status(401).json({ message: "Invalid token" });
     try {
         const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
