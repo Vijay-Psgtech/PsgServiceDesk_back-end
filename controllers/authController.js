@@ -31,8 +31,10 @@ export const login = async (req, res) => {
         }
         const payload = {
             id: user._id,
-            role: user.role,
+            userId: user.userId,
             userName: user.userName,
+            name: user.firstName,
+            role: user.role,
             institution: user.institution,
         };
         const accessToken = createAccessToken(payload);
