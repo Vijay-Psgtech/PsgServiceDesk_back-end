@@ -8,6 +8,7 @@ const cookieOptions = (maxAgeMs) => ({
     httpOnly: true,
     secure: false, // Set to true if using HTTPS
     sameSite: "Lax",
+    path: "/",
     maxAge: maxAgeMs
 });
 
@@ -58,6 +59,9 @@ export const login = async (req, res) => {
 };
 
 export const refresh = async (req, res) => {
+
+    console.log("Incoming cookies:", req.cookies);
+
     const token = req.cookies.refreshToken;
     if(!token) return res.status(401).json({ message: "No token provided" });
 
@@ -80,8 +84,9 @@ export const refresh = async (req, res) => {
 
 export const logout = async (req, res) => {
     const token = req.cookies.refreshToken;
-    if(token) {
-        await RefreshToken.deleteOne({ token }).catch(() => {});
+    if (token) {
+      // Optionally delete it from DB if you store refresh tokens
+      await RefreshToken.deleteOne({ token });
     }
     res.clearCookie("refreshToken", cookieOptions(0));
     res.status(200).json({ message: "Logged out successfully" });
